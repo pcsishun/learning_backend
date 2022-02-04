@@ -19,36 +19,36 @@ const enryptRound = 10;
 
 app.post('/register', async(req, res) => {
     const { firstname, lastname, email, password} = req.body;
+    // console.log(req.body)
     if(!(firstname && lastname && email && password)){
         const replyText = {
             registerStatus: false,
             text: "all input must not be empty."
         }
         res.status(400).send(replyText)
-    }else{
-        try{
-            const userExist = await User.findOne({email});
-            const hashPassword = bcrypt.hashSync(password, enryptRound);
-            if(userExist){
-                const replyText = {
-                    registerStatus: false, 
-                    text: "this email alreadly register."
-                }
-                res.status(400).send(replyText)
-            }else{
-                await User.create({
-                    firstname: firstname, 
-                    lastname: lastname,
-                    email: email,
-                    password: hashPassword
-                })
-                const replyText = {
-                    registerStatus: true,
-                    text: "register success."
-                }
-                res.status(200).send(replyText)
+    } 
+    try{
+        const userExist = await User.findOne({email});
+        const hashPassword = bcrypt.hashSync(password, enryptRound);
+        if(userExist){
+            const replyText = {
+                registerStatus: false, 
+                text: "this email alreadly register."
             }
-        }catch(err){
+            res.status(400).send(replyText)
+        }else{
+            await User.create({
+                firstname: firstname, 
+                lastname: lastname,
+                email: email,
+                password: hashPassword
+            })
+            const replyText = {
+                registerStatus: true,
+                text: "register success."
+            }
+            res.status(200).send(replyText)
+        }}catch(err){
             const replyText = {
                 registerStatus: false, 
                 text: "Opps something wrong on server!"
@@ -56,8 +56,7 @@ app.post('/register', async(req, res) => {
             res.status(501).send(replyText)
         }
     }
-
-})
+)
 
 app.post('/login', async(req, res) => {
     const { email, password } = req.body;
@@ -75,6 +74,7 @@ app.post('/login', async(req, res) => {
                 email: setEmail.email,
                 token: genToken
             }
+            console.log(replyLogin)
             res.status(201).send(replyLogin)
         }
     }catch(err){
@@ -86,7 +86,9 @@ app.post('/login', async(req, res) => {
     }
 })
 
-app.post('/checkauth',auth, async(req, res)=>{
+app.post('/checkauth', auth, async(req, res)=>{
     console.log("Hello World");
     res.status(200).send("Hello World")
 })
+
+module.exports = app;
